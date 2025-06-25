@@ -162,6 +162,17 @@ TEST(WoodTest, UntreatedWhenMoistureBelowThreshold) {
     return true;
 }
 
+TEST(WoodTest, TypeUnchangedAfterProcessing) {
+    WoodInventory inv;
+    std::vector<WoodAction*> steps = { new DryWood(), new TreatWood(), new CutWood(1.0) };
+    std::string original_type = "Cherry";
+    WoodItem* cherry = new WoodItem(original_type, 18.0, 16.0, false, steps);
+    inv.addItem(cherry);
+    inv.processAll();
+    ASSERT_EQ(cherry->getType(), original_type);
+    return true;
+}
+
 int main() {
     RUN_TEST(WoodTest, AddSingleItem);
     RUN_TEST(WoodTest, MultipleItemsCount);
@@ -169,5 +180,6 @@ int main() {
     RUN_TEST(WoodTest, ConditionalTreatment);
     RUN_TEST(WoodTest, ThicknessUnchangedAfterProcessing);
     RUN_TEST(WoodTest, UntreatedWhenMoistureBelowThreshold);
+    RUN_TEST(WoodTest, TypeUnchangedAfterProcessing);
     return 0;
 }
