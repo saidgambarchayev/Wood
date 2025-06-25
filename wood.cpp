@@ -55,15 +55,15 @@ public:
 
 class DryWood : public WoodAction {
 public:
-    void perform(WoodItem &item) override {
+    void perform(WoodItem &item) override { 
         item.setMoisture(item.getMoisture() * 0.8);
     }
 };
 
 class TreatWood : public WoodAction {
 public:
-    void perform(WoodItem &item) override {
-        item.setTreated(true);
+    void perform(WoodItem &item) override { 
+        item.setTreated(true); 
     }
 };
 
@@ -141,10 +141,33 @@ TEST(WoodTest, ConditionalTreatment) {
     return true;
 }
 
+TEST(WoodTest, ThicknessUnchangedAfterProcessing) {
+    WoodInventory inv;
+    std::vector<WoodAction*> steps = { new DryWood(), new TreatWood() };
+    double initial_thickness = 20.0;
+    WoodItem* mahogany = new WoodItem("Mahogany", initial_thickness, 14.0, false, steps);
+    inv.addItem(mahogany);
+    inv.processAll();
+    ASSERT_EQ(mahogany->getThickness(), initial_thickness);
+    return true;
+}
+
+TEST(WoodTest, UntreatedWhenMoistureBelowThreshold) {
+    WoodInventory inv;
+    std::vector<WoodAction*> steps = { new ConditionalTreatment(new TreatWood(), "MoistureAbove", 15.0) };
+    WoodItem* cedar = new WoodItem("Cedar", 22.0, 12.0, false, steps);
+    inv.addItem(cedar);
+    inv.processAll();
+    ASSERT_TRUE(!cedar->isTreated());
+    return true;
+}
+
 int main() {
     RUN_TEST(WoodTest, AddSingleItem);
     RUN_TEST(WoodTest, MultipleItemsCount);
     RUN_TEST(WoodTest, ProcessDrying);
     RUN_TEST(WoodTest, ConditionalTreatment);
+    RUN_TEST(WoodTest, ThicknessUnchangedAfterProcessing);
+    RUN_TEST(WoodTest, UntreatedWhenMoistureBelowThreshold);
     return 0;
 }
