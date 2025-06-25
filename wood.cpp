@@ -173,6 +173,16 @@ TEST(WoodTest, TypeUnchangedAfterProcessing) {
     return true;
 }
 
+TEST(WoodTest, TreatmentAtExactMoistureThreshold) {
+    WoodInventory inv;
+    std::vector<WoodAction*> steps = { new ConditionalTreatment(new TreatWood(), "MoistureAbove", 15.0) };
+    WoodItem* birch = new WoodItem("Birch", 19.0, 15.0, false, steps);
+    inv.addItem(birch);
+    inv.processAll();
+    ASSERT_TRUE(!birch->isTreated());
+    return true;
+}
+
 int main() {
     RUN_TEST(WoodTest, AddSingleItem);
     RUN_TEST(WoodTest, MultipleItemsCount);
@@ -181,5 +191,6 @@ int main() {
     RUN_TEST(WoodTest, ThicknessUnchangedAfterProcessing);
     RUN_TEST(WoodTest, UntreatedWhenMoistureBelowThreshold);
     RUN_TEST(WoodTest, TypeUnchangedAfterProcessing);
+    RUN_TEST(WoodTest, TreatmentAtExactMoistureThreshold);
     return 0;
 }
